@@ -4,6 +4,8 @@ import pygame
 import random
 # Modulo da biblioteca PyGame que permite o acesso as teclas utilizadas
 from pygame.locals import *
+#Música 
+import pygame.mixer
 
 # Classe que representar o jogador
 class Player(pygame.sprite.Sprite):
@@ -60,6 +62,12 @@ class Enemy(pygame.sprite.Sprite):
 # Inicializa pygame
 pygame.init()
 
+#inicializando mixer
+pygame.mixer.init()
+pygame.mixer.music.set_volume (0.5)
+pygame.mixer.music.load('musica-2.mp3')
+pygame.mixer.music.play(-1)  # O argumento -1 faz com que a música seja reproduzida em um loop infinito
+
 # Cria a tela com resolução 800x600px
 screen = pygame.display.set_mode((800, 600))
 
@@ -106,6 +114,7 @@ all_sprites = pygame.sprite.Group() #Cria o grupo de todos os Sprites
 all_sprites.add(player) #Adicionar o player no grupo de todos os Sprites
 
 
+
 running = True #Flag para controle do jogo
 
 while running:
@@ -125,7 +134,6 @@ while running:
     rel_x = x % backgroud.get_rect().width
     screen.blit(backgroud, (0, 0)) #Atualiza a exibicao do plano de fundo do jogo (neste caso nao surte efeito)
     screen.blit(backgroud, (rel_x - backgroud.get_rect().width,0))#cria background
-
     if rel_x < 800:
          screen.blit(backgroud, (rel_x, 0))
 
@@ -135,26 +143,17 @@ while running:
     player.update(pressed_keys) #Atualiza a posicao do player conforme teclas usadas
     enemies.update() #Atualiza posicao dos inimigos
 
-
     for entity in all_sprites:
         screen.blit(entity.surf, entity.rect) #Atualiza a exibicao de todos os Sprites
 
     if pygame.sprite.spritecollideany(player, enemies): #Verifica se ocorreu a colisao do player com um dos inimigos
-        player.kill() #Se ocorrer a colisao, encerra o player
-    if pygame.sprite.spritecollideany(player, enemies):
-    # A colisão ocorreu. Você pode tratar isso como preferir.
-    # Por exemplo, aumentar a pontuação e recriar o inimigo.
-        total_lives -= 1
-        total_lives_text = font.render(f"Live: {total_lives}", True, (196, 0, 255))
+        remaining_lives -= 1
+        total_lives_text = font.render(f"LIVES: {remaining_lives}", True, (196, 0, 255))
 
     if remaining_lives <= 0:
-        game_over = True  # O jogador perdeu todas as vidas, definimos o estado de game over
+        game_over_surface = True  # O jogador perdeu todas as vidas, definimos o estado de game over
 
-    
-    
-
-
-    #Mostrar a tela de game over quando o jogo terminar:
+     #Mostrar a tela de game over quando o jogo terminar:
     if pygame.sprite.spritecollideany(player, enemies):
         # A colisão ocorreu.
         # Encerrar o jogo e mostrar a tela de game over.
@@ -164,7 +163,5 @@ while running:
         screen.blit(game_over_surface, (0, 0))
         screen.blit(game_over_text, game_over_rect)
 
-    
-    
-    
+
     pygame.display.flip() #Atualiza a projecao do jogo
